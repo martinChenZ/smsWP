@@ -18,6 +18,45 @@ var (
 	FirstTimes int
 )
 
+func main() {
+	//
+	//http.HandleFunc("/compotion", Compotion)
+	//
+	//http.ListenAndServe(":8086", nil)
+	var key string
+	flag.StringVar(&key, "k", "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", "帮助")
+
+	var port string
+	flag.StringVar(&port, "p", "8086", "帮助")
+
+	var access string
+	flag.StringVar(&access, "acc", "Gpt_key@!@#", "帮助")
+
+	var freeTimes int64
+	flag.Int64Var(&freeTimes, "t", 9, "帮助")
+
+	var firstTimes int
+	flag.IntVar(&firstTimes, "f", 15, "帮助")
+
+	flag.Parse()
+	remote.Appkey = key
+	AccCode = access
+	business.FreeT = freeTimes
+	FirstTimes = firstTimes
+	s := g.Server()
+	s.BindHandler("/completion", Completion)
+	s.BindHandler("/mykey", QtyApi)
+	s.BindHandler("/AddKey", AddKey)
+
+	atoi, err := strconv.Atoi(port)
+	if err != nil {
+		fmt.Println("参数异常")
+		return
+	}
+	s.SetPort(atoi)
+	s.Run()
+}
+
 type RegisterRes struct {
 	Code  int         `json:"code"`
 	Error string      `json:"error"`
@@ -141,42 +180,4 @@ func AddKey(r *ghttp.Request) {
 		Data: "新增成功",
 	})
 
-}
-
-func main() {
-	//
-	//http.HandleFunc("/compotion", Compotion)
-	//
-	//http.ListenAndServe(":8086", nil)
-	var key string
-	flag.StringVar(&key, "k", "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", "帮助")
-
-	var port string
-	flag.StringVar(&port, "p", "8086", "帮助")
-
-	var access string
-	flag.StringVar(&access, "a", "Gpt_key@!@#", "帮助")
-	AccCode = access
-	var freeTimes int64
-	flag.Int64Var(&freeTimes, "t", 9, "帮助")
-	business.FreeT = freeTimes
-
-	var firstTimes int
-	flag.IntVar(&firstTimes, "f", 15, "帮助")
-	FirstTimes = firstTimes
-
-	flag.Parse()
-	remote.Appkey = key
-	s := g.Server()
-	s.BindHandler("/completion", Completion)
-	s.BindHandler("/mykey", QtyApi)
-	s.BindHandler("/AddKey", AddKey)
-
-	atoi, err := strconv.Atoi(port)
-	if err != nil {
-		fmt.Println("参数异常")
-		return
-	}
-	s.SetPort(atoi)
-	s.Run()
 }
