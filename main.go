@@ -30,7 +30,7 @@ func main() {
 	flag.StringVar(&port, "p", "8086", "帮助")
 
 	var access string
-	flag.StringVar(&access, "acc", "Gpt_key@!@#", "帮助")
+	flag.StringVar(&access, "a", "Gpt_key@!@#", "帮助")
 
 	var freeTimes int64
 	flag.Int64Var(&freeTimes, "t", 9, "帮助")
