@@ -65,10 +65,12 @@ func QtyApi(r *ghttp.Request) {
 	}
 	if has {
 		r.Response.WriteJsonExit(RegisterRes{
-			Data: user.ApiKey,
+			Code: 0,
+			Data: &map[string]string{"key": user.ApiKey},
 		})
 	} else {
 		r.Response.WriteJsonExit(RegisterRes{
+			Code: 1,
 			Data: "无数据",
 		})
 	}
