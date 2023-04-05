@@ -26,7 +26,7 @@ type GptUserReq struct {
 type GptUser struct {
 	ApiKey     string
 	OrderId    string `xorm:"VARCHAR(30) 'Order_no'"`
-	Balance    int8
+	Balance    int
 	UpdateTime time.Time
 }
 

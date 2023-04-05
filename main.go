@@ -14,7 +14,8 @@ import (
 )
 
 var (
-	AccCode string
+	AccCode    string
+	FirstTimes int
 )
 
 type RegisterRes struct {
@@ -129,7 +130,7 @@ func AddKey(r *ghttp.Request) {
 	_, err = session.Insert(&business.GptUser{
 		id.String(),
 		user.OrderId,
-		3,
+		FirstTimes,
 		time.Now(),
 	})
 	if err != nil {
@@ -148,11 +149,9 @@ func main() {
 	//
 	//http.ListenAndServe(":8086", nil)
 	var key string
-	//flag.StringVar(&name, "name", "Go语言编程之旅", "帮助")
 	flag.StringVar(&key, "k", "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", "帮助")
 
 	var port string
-	//flag.StringVar(&name, "name", "Go语言编程之旅", "帮助")
 	flag.StringVar(&port, "p", "8086", "帮助")
 
 	var access string
@@ -161,6 +160,10 @@ func main() {
 	var freeTimes int64
 	flag.Int64Var(&freeTimes, "t", 9, "帮助")
 	business.FreeT = freeTimes
+
+	var firstTimes int
+	flag.IntVar(&firstTimes, "f", 15, "帮助")
+	FirstTimes = firstTimes
 
 	flag.Parse()
 	remote.Appkey = key
