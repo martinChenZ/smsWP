@@ -130,6 +130,8 @@ func AddKey(r *ghttp.Request) {
 		})
 	}
 	if user.Access != AccCode {
+		fmt.Println("req: ", user.Access)
+		fmt.Println("server: ", AccCode)
 		r.Response.WriteJsonExit(RegisterRes{
 			Code: 0,
 			Data: "无权限",
