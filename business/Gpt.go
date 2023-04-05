@@ -11,9 +11,16 @@ import (
 	"time"
 )
 
+var FreeT int64
+
 type Question struct {
 	Appkey   string             `json:"privateKey"`
-	Messages []remote.ChoiceMsg `json:"messages"`
+	Messages []remote.ChoiceMsg `json:"messages" `
+}
+
+type GptUserReq struct {
+	Access string
+	GptUser
 }
 
 type GptUser struct {
@@ -103,12 +110,12 @@ func validNoApiBycache(g *GptUser, ip string) (msg string) {
 func validNoApiBySql(g *GptUser, ip string, session *xorm.Engine) (msg string) {
 	session.ShowSQL(true)
 	//exec, err := session.Exec("select count(1) from gpt_log where  request_ip = " + ip + " and update_time > now() + INTERVAL 1 Day ")
-	count, err := session.Table("gpt_log").Where("request_ip = '" + ip + "' and update_time > now() + INTERVAL -1 Day ").Count()
+	count, err := session.Table("gpt_log").Where("request_ip = '" + ip + "' and update_time > date('now','-1 day') ").Count()
 	if err != nil {
 		return ""
 	}
 	fmt.Println("@@", count)
-	if count > 2 {
+	if count > FreeT {
 		msg = "无请求次数"
 	}
 	return

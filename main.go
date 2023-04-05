@@ -13,6 +13,10 @@ import (
 	"time"
 )
 
+var (
+	AccCode string
+)
+
 type RegisterRes struct {
 	Code  int         `json:"code"`
 	Error string      `json:"error"`
@@ -78,18 +82,49 @@ func QtyApi(r *ghttp.Request) {
 }
 
 func AddKey(r *ghttp.Request) {
-	var user *business.GptUser
+	var user *business.GptUserReq
 	if err := r.Parse(&user); err != nil {
 		r.Response.WriteJsonExit(RegisterRes{
 			Code:  1,
 			Error: err.Error(),
 		})
 	}
+	if user.Access != AccCode {
+		r.Response.WriteJsonExit(RegisterRes{
+			Code: 0,
+			Data: "无权限",
+		})
+		return
+	}
+
 	session, err := client.GetConnect()
+	session.ShowSQL(true)
 	if err != nil {
 		fmt.Println("数据库连接异常", err)
 	}
 	defer session.Close()
+	// 已存在的apikey 新增
+	if user.ApiKey != "" {
+		curUser := &business.GptUser{}
+		session.Where("api_key = '" + user.ApiKey + "'").Get(curUser)
+		curUser.Balance = user.Balance
+		session.Where("api_key = '" + user.ApiKey + "'").Update(curUser)
+		r.Response.WriteJsonExit(RegisterRes{
+			Code: 0,
+			Data: "更新成功",
+		})
+		return
+	}
+	count, _ := session.Table("gpt_user").Where("order_no = " + user.OrderId).Count()
+	if count > 1 {
+		fmt.Println("重复订单id", user.OrderId)
+		r.Response.WriteJsonExit(RegisterRes{
+			Code: 1,
+			Data: "重复订单id",
+		})
+		return
+	}
+
 	id := uuid.NewV4()
 	_, err = session.Insert(&business.GptUser{
 		id.String(),
@@ -100,6 +135,10 @@ func AddKey(r *ghttp.Request) {
 	if err != nil {
 		fmt.Println("新增错误", err)
 	}
+	r.Response.WriteJsonExit(RegisterRes{
+		Code: 0,
+		Data: "新增成功",
+	})
 
 }
 
@@ -115,6 +154,13 @@ func main() {
 	var port string
 	//flag.StringVar(&name, "name", "Go语言编程之旅", "帮助")
 	flag.StringVar(&port, "p", "8086", "帮助")
+
+	var access string
+	flag.StringVar(&access, "a", "Gpt_key@!@#", "帮助")
+	AccCode = access
+	var freeTimes int64
+	flag.Int64Var(&freeTimes, "t", 9, "帮助")
+	business.FreeT = freeTimes
 
 	flag.Parse()
 	remote.Appkey = key
