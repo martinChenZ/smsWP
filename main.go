@@ -59,7 +59,7 @@ func main() {
 
 type RegisterRes struct {
 	Code  int         `json:"code"`
-	Error string      `json:"error"`
+	Error string      `json:"errorMsg"`
 	Data  interface{} `json:"data"`
 }
 
