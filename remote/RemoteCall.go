@@ -1,8 +1,10 @@
 package remote
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/sashabaranov/go-openai"
 	"io"
 	"net/http"
 	"strings"
@@ -60,4 +62,29 @@ func CallGpt3(msg []ChoiceMsg) string {
 	}
 
 	return string(body)
+}
+
+func CallGpt(msg []openai.ChatCompletionMessage) string {
+	client := openai.NewClient(Appkey)
+	if msg[0].Role != openai.ChatMessageRoleSystem {
+		msg = append([]openai.ChatCompletionMessage{
+			{Role: "system",
+				Content: "You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible."}}, msg...)
+	}
+
+	resp, err := client.CreateChatCompletion(
+		context.Background(),
+		openai.ChatCompletionRequest{
+			Model:    openai.GPT3Dot5Turbo,
+			Messages: msg,
+		},
+	)
+
+	if err != nil {
+		fmt.Printf("ChatCompletion error: %v\n", err)
+		return "请求失败"
+	}
+
+	fmt.Println(resp.Choices[0].Message.Content)
+	return resp.Choices[0].Message.Content
 }

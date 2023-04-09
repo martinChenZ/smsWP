@@ -3,6 +3,7 @@ package business
 import (
 	"fmt"
 	"github.com/go-xorm/xorm"
+	"github.com/sashabaranov/go-openai"
 	"gpt-backend/client"
 	"gpt-backend/remote"
 	"time"
@@ -11,8 +12,8 @@ import (
 var FreeT int64
 
 type Question struct {
-	Appkey   string             `json:"privateKey"`
-	Messages []remote.ChoiceMsg `json:"messages" `
+	Appkey   string                         `json:"privateKey"`
+	Messages []openai.ChatCompletionMessage `json:"messages" `
 }
 
 type GptUserReq struct {
@@ -56,14 +57,14 @@ func CallGpt(q *Question, ip string) string {
 		if "" != msg {
 			return msg
 		}
-		msg = remote.CallGpt3(q.Messages)
+		msg = remote.CallGpt(q.Messages)
 		log.RequestIp = ip
 		log.ApiKey = g.ApiKey
 		log.Response = msg
 		log.UpdateTime = time.Now()
 	} else {
 
-		msg = remote.CallGpt3(q.Messages)
+		msg = remote.CallGpt(q.Messages)
 		fmt.Println(msg)
 
 		_, err = connect.Exec(fmt.Sprintf("update gpt_user set balance = %v where api_key = '%v' ", g.Balance-1, g.ApiKey))
