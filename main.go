@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
+	"github.com/sashabaranov/go-openai"
 	uuid "github.com/satori/go.uuid"
 	"gpt-backend/business"
 	"gpt-backend/client"
@@ -64,9 +65,9 @@ type RegisterRes struct {
 }
 
 type GptResp struct {
-	Messages []remote.ChoiceMsg `json:"messages"`
-	Reply    string             `json:"reply"`
-	ErrorMsg string             `json:"errorMsg"`
+	Messages []openai.ChatCompletionMessage `json:"messages"`
+	Reply    string                         `json:"reply"`
+	ErrorMsg string                         `json:"errorMsg"`
 }
 
 func Completion(r *ghttp.Request) {
@@ -109,7 +110,7 @@ func QtyApi(r *ghttp.Request) {
 	}
 	if has {
 		r.Response.WriteJsonExit(RegisterRes{
-			Code: 0,
+			Code: 200,
 			Data: &map[string]string{"key": user.ApiKey},
 		})
 	} else {

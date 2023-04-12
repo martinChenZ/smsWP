@@ -12,7 +12,7 @@ import (
 var FreeT int64
 
 type Question struct {
-	Appkey   string                         `json:"privateKey"`
+	Appkey   string                         `json:"model"`
 	Messages []openai.ChatCompletionMessage `json:"messages" `
 }
 
