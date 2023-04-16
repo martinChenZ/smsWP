@@ -79,6 +79,9 @@ func Completion(r *ghttp.Request) {
 		})
 	}
 	ip := r.GetClientIp()
+	fmt.Println("clientIp: ", ip)
+	ip = r.GetRemoteIp()
+	fmt.Println("remoteIp: ", ip)
 	gpt := business.CallGpt(q, ip)
 	r.Response.WriteJsonExit(RegisterRes{
 		Data: &GptResp{
